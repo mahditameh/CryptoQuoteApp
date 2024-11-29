@@ -1,0 +1,31 @@
+﻿@using Applications.DTO
+@model CryptoQuoteDto
+
+@{
+    ViewData["Title"] = "Crypto Quotes for " + Model.Symbol;
+}
+
+<h1>Quotes for <strong>@Model.Symbol</strong></h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Currency</th>
+            <th>Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.ConvertedPrices != null)
+        {
+            foreach (var rate in Model.ConvertedPrices)
+            {
+                <tr>
+                    <td>@rate.Key</td>
+                    <td>@rate.Value.ToString("C")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Index")">Back</a>

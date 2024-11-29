@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Crypto Dashboard";
+}
+
+<h1>Crypto Dashboard</h1>
+
+<form asp-action="GetQuotes" method="post">
+    <div>
+        <label for="code">Enter Cryptocurrency Code (e.g., BTC):</label>
+        <input type="text" name="code" id="code" required />
+        <button type="submit">Get Quotes</button>
+    </div>
+</form>
