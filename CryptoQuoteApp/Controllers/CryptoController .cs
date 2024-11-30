@@ -1,5 +1,5 @@
 ﻿using Applications.Contracts;
-using CryptoQuoteApp.Helpers;
+using CryptoQuoteApp.Helpers.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoQuoteApp.Controllers

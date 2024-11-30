@@ -1,5 +1,6 @@
 using Applications;
 using Infrastructure;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,10 @@ var configurationBuilder = new ConfigurationBuilder()
     .AddJsonFile($"serilog.{environment}.json", optional: true, reloadOnChange: true);
 
 var configuration = configurationBuilder.Build();
-
+var logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .Enrich.FromLogContext()
+                .CreateLogger();
 // Adding services
 builder.Services.AddControllers();
 builder.Services.RegisterRepositories(configuration);
@@ -35,9 +39,11 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllersWithViews();
-
+builder.Host.UseSerilog((ctx, lc)
+              => lc.ReadFrom.Configuration(ctx.Configuration));
+builder.Logging.AddSerilog(logger);
 var app = builder.Build();
-
+app.UseMiddleware<ExceptionMiddleware>();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -49,6 +55,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -10,6 +10,7 @@ namespace CryptoTest
     public class CryptoRepositoryTests
     {
         private readonly Mock<IConfiguration> _mockConfiguration;
+        private readonly string _baseCurrency = "USD";
 
         public CryptoRepositoryTests()
         {
@@ -37,7 +38,7 @@ namespace CryptoTest
             var repository = new CryptoRepository(httpClient, _mockConfiguration.Object);
 
             // Act
-            var price = await repository.GetCryptoPriceAsync("BTC");
+            var price = await repository.GetCryptoPriceAsync("BTC", _baseCurrency);
 
             // Assert
             Assert.Equal(20000m, price);
@@ -54,7 +55,7 @@ namespace CryptoTest
 
             // Act & Assert
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                await repository.GetCryptoPriceAsync("INVALID_CURRENCY"));
+                await repository.GetCryptoPriceAsync("INVALID_CURRENCY", _baseCurrency));
         }
     }
 }

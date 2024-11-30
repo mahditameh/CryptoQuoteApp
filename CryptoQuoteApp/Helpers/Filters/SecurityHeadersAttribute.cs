@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace CryptoQuoteApp.Helpers
+namespace CryptoQuoteApp.Helpers.Filters
 {
     public class SecurityHeadersAttribute : ActionFilterAttribute
     {
