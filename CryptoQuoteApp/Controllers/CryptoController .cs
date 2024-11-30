@@ -1,9 +1,10 @@
 ﻿using Applications.Contracts;
+using CryptoQuoteApp.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoQuoteApp.Controllers
 {
-
+    [SecurityHeadersAttribute]
     public class CryptoController : Controller
     {
         private readonly ICryptoService _cryptoService;
