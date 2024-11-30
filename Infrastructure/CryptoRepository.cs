@@ -1,8 +1,6 @@
 ﻿using Domins;
 using Infrastructure.CoinMarketcap;
 using Microsoft.Extensions.Configuration;
-using RestSharp;
-using System.Net;
 using System.Text.Json;
 using System.Web;
 
@@ -13,58 +11,92 @@ namespace Infrastructure
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
 
+        private const string CoinMarketCapApiKeyHeader = "X-CMC_PRO_API_KEY";
+        private const string ExchangeApiKeyHeader = "apikey";
+        private const string AcceptHeader = "Accepts";
+        private const string AcceptHeaderValue = "application/json";
 
         public CryptoRepository(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _configuration = configuration;
-
         }
 
         public async Task<decimal> GetCryptoPriceAsync(string cryptoCode, string symbol)
         {
-            var apiKey = _configuration["CoinMarketCap:ApiKey"];
-            var url = _configuration["CoinMarketCap:Url"];
-            var uRLBuilder = new UriBuilder($"{url}");
-            var queryString = HttpUtility.ParseQueryString(string.Empty);
-            queryString["symbol"] = cryptoCode;
-            queryString["convert"] = symbol;
-            uRLBuilder.Query = queryString.ToString();
+            var requestUrl = ConstructCoinMarketCapUrl(cryptoCode, symbol);
+            var response = await SendRequestAsync(requestUrl, new Dictionary<string, string>
+            {
+                { CoinMarketCapApiKeyHeader, _configuration["CoinMarketCap:ApiKey"] },
+                { AcceptHeader, AcceptHeaderValue }
+            });
 
-            var client = new WebClient();
-            client.Headers.Add("X-CMC_PRO_API_KEY", apiKey);
-            client.Headers.Add("Accepts", "application/json");
-            var response = client.DownloadString(uRLBuilder.ToString());
             var quotes = JsonSerializer.Deserialize<QuoteJsonModel>(response);
             return (decimal)quotes.Data.BTC.Quote.USD.Price;
-
         }
 
         public async Task<Dictionary<string, decimal>> GetExchangeRatesAsync()
         {
             var apiKey = _configuration["ExchangeRates:ApiKey"];
-            var url = _configuration["ExchangeRates:Url"];
             var currencies = _configuration["ExchangeRates:Currencies"];
-            var requestUrl = $"{url}symbols={currencies}&base=USD";
+            var requestUrl = $"{_configuration["ExchangeRates:Url"]}access_key={apiKey}&symbols={currencies}&base=USD";
 
-            var client = new RestClient();
-            var request = new RestRequest(requestUrl, Method.Get);
-
-            request.AddHeader("apikey", apiKey);
-            RestResponse restResponse = await client.ExecuteAsync(request);
-            if (!restResponse.IsSuccessful)
+            // Ensure the complete URL is formed correctly
+            if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(currencies))
             {
-                throw new Exception($"Error fetching exchange rates: {restResponse.ErrorMessage}");
+                throw new ArgumentException("API Key or currencies are not configured correctly.");
             }
 
-            var responseContent = restResponse.Content;
+            var response = await SendRequestAsync(requestUrl, new Dictionary<string, string>
+            {
+                { ExchangeApiKeyHeader, apiKey }
+            });
 
+            // Deserialize the response
+            var exchangeRates = JsonSerializer.Deserialize<ExchangeRateResponse>(response);
 
-            ExchangeRateResponse? exchangeRates = JsonSerializer.Deserialize<ExchangeRateResponse>(responseContent);
-
+            // Check for rates being returned
+            if (exchangeRates == null || exchangeRates.Rates == null)
+            {
+                throw new Exception("No exchange rates found in the response.");
+            }
 
             return exchangeRates.Rates;
         }
+
+
+        private string ConstructCoinMarketCapUrl(string cryptoCode, string symbol)
+        {
+            var url = _configuration["CoinMarketCap:Url"];
+            var queryString = HttpUtility.ParseQueryString(string.Empty);
+            queryString["symbol"] = cryptoCode;
+            queryString["convert"] = symbol;
+
+            // Construct the full URL with the query string
+            return new UriBuilder(url) { Query = queryString.ToString() }.ToString();
+        }
+
+        private async Task<string> SendRequestAsync(string requestUrl, Dictionary<string, string> headers = null)
+        {
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+
+            // Add any provided headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    requestMessage.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"Error fetching data: {response.ReasonPhrase}");
+            }
+
+            return await response.Content.ReadAsStringAsync();
+        }
     }
 }
-
