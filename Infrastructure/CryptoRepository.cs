@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Web;
 
 [assembly: InternalsVisibleTo("CryptoTest")]
+[assembly: InternalsVisibleTo("InfrastructureConfig")]
 namespace Infrastructure
 {
     internal class CryptoRepository : ICryptoRepository

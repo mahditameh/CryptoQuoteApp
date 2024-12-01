@@ -32,23 +32,18 @@ namespace Application.Handlers
                 return ApiResult<CryptoQuoteDto>.Failure($"The cryptocurrency code '{request.CryptoCode}' is invalid.");
             }
 
-            // Fetch the base price (in USD)
             var basePriceValue = await _cryptoRepository.GetCryptoPriceAsync(request.CryptoCode, "USD");
             var basePrice = new Price(basePriceValue, "USD");
 
-            // Fetch exchange rates
             var exchangeRates = await _cryptoRepository.GetExchangeRatesAsync();
 
-            // Convert exchange rates to Price objects
             var ratesAsPrices = exchangeRates.ToDictionary(
                 rate => rate.Key,
                 rate => new Price(rate.Value, rate.Key)
             );
-
-            // Calculate equivalent rates using the domain service
             var convertedPrices = _cryptoDomainService.CalculateEquivalentRates(basePrice, ratesAsPrices);
 
-            // Return the result
+
             return ApiResult<CryptoQuoteDto>.Success(new CryptoQuoteDto
             {
                 Price = basePrice.Value,
