@@ -10,4 +10,9 @@
         <input type="text" name="code" id="code" required />
         <button type="submit">Get Quotes</button>
     </div>
+
+    <!-- Display validation summary for model errors -->
+    <div class="text-danger">
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    </div>
 </form>

@@ -1,6 +1,8 @@
 ﻿using Application.Handlers;
 using Application.Queries;
 using Domain;
+using Domain.Services;
+using Domain.ValueObjects;
 using Moq;
 
 namespace CryptoTest
@@ -9,13 +11,15 @@ namespace CryptoTest
     {
         private readonly Mock<ICryptoRepository> _mockRepo;
         private readonly Mock<ICryptoValidator> _mockValidator;
+        private readonly CryptoDomainService _domainService;
         private readonly GetCryptoQuoteQueryHandler _handler;
 
         public GetCryptoQuoteQueryHandlerTests()
         {
             _mockRepo = new Mock<ICryptoRepository>();
             _mockValidator = new Mock<ICryptoValidator>();
-            _handler = new GetCryptoQuoteQueryHandler(_mockRepo.Object, _mockValidator.Object);
+            _domainService = new CryptoDomainService();
+            _handler = new GetCryptoQuoteQueryHandler(_mockRepo.Object, _mockValidator.Object, _domainService);
         }
 
         [Fact]
@@ -25,25 +29,26 @@ namespace CryptoTest
             var cryptoCode = "BTC";
             var query = new GetCryptoQuoteQuery { CryptoCode = cryptoCode };
 
-            var expectedPrice = 20000m;
-            var expectedEquivalentPrices = new Dictionary<string, decimal>
-            {
-                { "EUR", 0.85m },
-                { "GBP", 0.75m }
-            };
+            var expectedPrice = new Price(20000m, "USD");
+            var exchangeRates = new Dictionary<string, Price>
+        {
+            { "EUR", new Price(0.85m, "EUR") },
+            { "GBP", new Price(0.75m, "GBP") }
+        };
+
             var expectedConvertedPrices = new Dictionary<string, decimal>
-            {
-                { "EUR", 17000m },
-                { "GBP", 15000m }
-            };
+        {
+            { "EUR", 17000m },
+            { "GBP", 15000m }
+        };
 
             // Mock the validator and repository
             _mockValidator.Setup(v => v.IsValidCryptoSymbolAsync(cryptoCode))
                           .ReturnsAsync(true); // Validator returns valid
             _mockRepo.Setup(repo => repo.GetCryptoPriceAsync(cryptoCode, "USD"))
-                     .ReturnsAsync(expectedPrice);
+                     .ReturnsAsync(expectedPrice.Value);
             _mockRepo.Setup(repo => repo.GetExchangeRatesAsync())
-                     .ReturnsAsync(expectedEquivalentPrices);
+                     .ReturnsAsync(exchangeRates.ToDictionary(k => k.Key, v => v.Value.Value));
 
             // Act
             var result = await _handler.Handle(query, default);
@@ -52,7 +57,7 @@ namespace CryptoTest
             Assert.NotNull(result);
             Assert.True(result.IsSuccess);
             Assert.Equal(cryptoCode.ToUpper(), result.Data.Symbol);
-            Assert.Equal(expectedPrice, result.Data.Price);
+            Assert.Equal(expectedPrice.Value, result.Data.Price);
             Assert.Equal(expectedConvertedPrices, result.Data.ConvertedPrices);
         }
 
@@ -76,4 +81,5 @@ namespace CryptoTest
             Assert.Equal($"The cryptocurrency code '{cryptoCode}' is invalid.", result.Error);
         }
     }
+
 }

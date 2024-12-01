@@ -1,6 +1,8 @@
 ﻿using Application.Contracts;
 using Application.DTO;
 using Domain;
+using Domain.Services;
+using Domain.ValueObjects;
 using System.Runtime.CompilerServices;
 
 
@@ -12,45 +14,30 @@ namespace Infrastructure.Services
     internal class CryptoService : ICryptoService
     {
         private readonly ICryptoRepository _cryptoRepository;
-        private readonly ICryptoValidator _cryptoValidator; // Add Validator
-        private readonly string _baseCurrency = "USD";
+        private readonly CryptoDomainService _cryptoDomainService;
 
-        public CryptoService(ICryptoRepository cryptoRepository, ICryptoValidator cryptoValidator)
+        public CryptoService(ICryptoRepository cryptoRepository, CryptoDomainService cryptoDomainService)
         {
             _cryptoRepository = cryptoRepository;
-            _cryptoValidator = cryptoValidator; // Initialize Validator
+            _cryptoDomainService = cryptoDomainService;
         }
 
         public async Task<CryptoQuoteDto> GetCryptoQuoteAsync(string cryptoCode)
         {
+            var cryptoPrice = new Price(await _cryptoRepository.GetCryptoPriceAsync(cryptoCode, "USD"), "USD");
+            var exchangeRates = await _cryptoRepository.GetExchangeRatesAsync();
 
-            if (!await _cryptoValidator.IsValidCryptoSymbolAsync(cryptoCode))
+            var convertedPrices = _cryptoDomainService.CalculateEquivalentRates(
+                cryptoPrice,
+                exchangeRates.ToDictionary(rate => rate.Key, rate => new Price(rate.Value, rate.Key))
+            );
+
+            return new CryptoQuoteDto
             {
-                throw new ArgumentException($"The cryptocurrency code '{cryptoCode}' is invalid.");
-            }
-
-            var cryptoPrice = await _cryptoRepository.GetCryptoPriceAsync(cryptoCode, _baseCurrency);
-
-            return new CryptoQuoteDto()
-            {
-                Price = cryptoPrice,
+                Price = cryptoPrice.Value,
                 Symbol = cryptoCode.ToUpper(),
-                ConvertedPrices = await GettingEquivalentRateOtherCurrencies(cryptoPrice, _baseCurrency)
+                ConvertedPrices = convertedPrices
             };
         }
-
-        private async Task<Dictionary<string, decimal>> GettingEquivalentRateOtherCurrencies(decimal priceInUSD, string symbol)
-        {
-            var currenciesRates = await _cryptoRepository.GetExchangeRatesAsync();
-            var equivalentAmounts = new Dictionary<string, decimal>();
-
-            foreach (var currency in currenciesRates.Keys)
-            {
-                equivalentAmounts[currency] = priceInUSD * currenciesRates[currency];
-            }
-
-            return equivalentAmounts;
-        }
     }
-
 }
