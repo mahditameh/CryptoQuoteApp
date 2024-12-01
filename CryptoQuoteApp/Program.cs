@@ -1,4 +1,4 @@
-using CryptoQuoteApp.Helpers.MidedelWare;
+using CryptoQuoteApp.Helpers.Middleware;
 using InfrastructureConfig;
 using Serilog;
 
