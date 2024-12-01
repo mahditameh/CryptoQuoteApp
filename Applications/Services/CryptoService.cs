@@ -1,10 +1,14 @@
 ﻿using Applications.Contracts;
 using Applications.DTO;
 using Domins;
+using System.Runtime.CompilerServices;
 
+
+[assembly: InternalsVisibleTo("CryptoTest")]
 namespace Applications.Services
 {
-    public class CryptoService : ICryptoService
+
+    internal class CryptoService : ICryptoService
     {
         private readonly ICryptoRepository _cryptoRepository;
         private readonly string _baseCurrency = "USD";

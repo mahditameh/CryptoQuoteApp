@@ -23,7 +23,7 @@ namespace CryptoQuoteApp.Helpers
                     culture = new CultureInfo("en-AU");
                     break;
                 default:
-                    culture = CultureInfo.InvariantCulture; // Default fallback to InvariantCulture
+                    culture = CultureInfo.InvariantCulture;
                     break;
             }
 

@@ -1,12 +1,14 @@
 ﻿using Domins;
 using Infrastructure.CoinMarketcap;
 using Microsoft.Extensions.Configuration;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Web;
 
+[assembly: InternalsVisibleTo("CryptoTest")]
 namespace Infrastructure
 {
-    public class CryptoRepository : ICryptoRepository
+    internal class CryptoRepository : ICryptoRepository
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;

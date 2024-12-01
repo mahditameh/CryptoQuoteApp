@@ -22,7 +22,7 @@ namespace CryptoTest
         public async Task GetCryptoPriceAsync_ValidCryptoCode_ReturnsCorrectPrice()
         {
             // Arrange
-            var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = JsonContent.Create(new
                 {
@@ -33,7 +33,7 @@ namespace CryptoTest
                 })
             };
 
-            var handler = new HttpMessageHandlerStub(responseMessage);
+            var handler = new HttpMessageHandlerStub(mockResponse);
             var httpClient = new HttpClient(handler);
             var repository = new CryptoRepository(httpClient, _mockConfiguration.Object);
 
