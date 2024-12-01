@@ -1,7 +1,7 @@
 ﻿using Serilog;
 using System.Net;
 
-namespace CryptoQuoteApp.Helpers.MidedelWare
+namespace CryptoQuoteApp.Helpers.Middleware
 {
     public class ExceptionMiddleware
     {
