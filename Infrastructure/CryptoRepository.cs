@@ -1,5 +1,5 @@
-﻿using Domins;
-using Infrastructure.CoinMarketcap.GetCryptoDetails;
+﻿using Applications.CoinMarketcap;
+using Domins;
 using Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;

@@ -1,10 +1,11 @@
 ﻿using Domins;
+using Infrastructure;
 using Infrastructure.Configurations;
 using Infrastructure.Validators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure
+namespace InfrastructureConfig
 {
     public static class InfraDependencyInjection
     {

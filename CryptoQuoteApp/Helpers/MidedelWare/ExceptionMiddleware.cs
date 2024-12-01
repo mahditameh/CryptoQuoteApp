@@ -1,41 +1,43 @@
 ﻿using Serilog;
 using System.Net;
 
-public class ExceptionMiddleware
+namespace CryptoQuoteApp.Helpers.MidedelWare
 {
-    private readonly RequestDelegate _next;
-
-    public ExceptionMiddleware(RequestDelegate next)
+    public class ExceptionMiddleware
     {
-        _next = next;
-    }
+        private readonly RequestDelegate _next;
 
-    public async Task InvokeAsync(HttpContext context)
-    {
-        try
+        public ExceptionMiddleware(RequestDelegate next)
         {
-            await _next(context);
+            _next = next;
         }
-        catch (Exception ex)
+
+        public async Task InvokeAsync(HttpContext context)
         {
-            await HandleExceptionAsync(context, ex);
+            try
+            {
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                await HandleExceptionAsync(context, ex);
+            }
         }
-    }
 
-    private Task HandleExceptionAsync(HttpContext context, Exception ex)
-    {
-        Log.Error(ex, "An unhandled exception has occurred.");
-
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-        var result = new
+        private Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
-            message = "An unexpected error occurred. Please try again later.",
-            error = ex.Message
-        };
+            Log.Error(ex, "An unhandled exception has occurred.");
 
-        return context.Response.WriteAsJsonAsync(result);
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            var result = new
+            {
+                message = "An unexpected error occurred. Please try again later.",
+                error = ex.Message
+            };
+
+            return context.Response.WriteAsJsonAsync(result);
+        }
     }
 }
-

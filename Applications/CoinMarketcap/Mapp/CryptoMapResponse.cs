@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Infrastructure.CoinMarketcap.Mapp
+namespace Applications.CoinMarketcap.Mapp
 {
     public class CryptoMapResponse
     {

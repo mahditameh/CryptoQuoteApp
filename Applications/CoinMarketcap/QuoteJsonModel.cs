@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Infrastructure.CoinMarketcap.GetCryptoDetails
+namespace Applications.CoinMarketcap
 {
     public class QuoteJsonModel
     {

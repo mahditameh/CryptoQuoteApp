@@ -1,5 +1,5 @@
-using Applications;
-using Infrastructure;
+using CryptoQuoteApp.Helpers.MidedelWare;
+using InfrastructureConfig;
 using Serilog;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
@@ -11,7 +11,6 @@ var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var isDevelopment = environment == Environments.Development;
 
 var configurationBuilder = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();//we can set the keys in Environment variable too for more securities
 
@@ -22,6 +21,7 @@ var logger = new LoggerConfiguration()
                 .CreateLogger();
 // Adding services
 builder.Services.AddControllers();
+
 builder.Services.RegisterRepositories(configuration);
 builder.Services.RegisterServices(configuration);
 

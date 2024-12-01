@@ -4,7 +4,9 @@ using Domins;
 using System.Runtime.CompilerServices;
 
 
+
 [assembly: InternalsVisibleTo("CryptoTest")]
+[assembly: InternalsVisibleTo("InfrastructureConfig")]
 namespace Applications.Services
 {
     internal class CryptoService : ICryptoService
@@ -21,7 +23,7 @@ namespace Applications.Services
 
         public async Task<CryptoQuoteDto> GetCryptoQuoteAsync(string cryptoCode)
         {
-            // Validate cryptoCode before proceeding
+
             if (!await _cryptoValidator.IsValidCryptoSymbolAsync(cryptoCode))
             {
                 throw new ArgumentException($"The cryptocurrency code '{cryptoCode}' is invalid.");
