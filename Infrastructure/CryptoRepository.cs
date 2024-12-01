@@ -1,6 +1,7 @@
 ﻿using Domins;
 using Infrastructure.CoinMarketcap;
-using Microsoft.Extensions.Configuration;
+using Infrastructure.Configurations;
+using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Web;
@@ -11,17 +12,17 @@ namespace Infrastructure
     internal class CryptoRepository : ICryptoRepository
     {
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
+        private readonly ThirdPartySettings _apiSettings;
 
         private const string CoinMarketCapApiKeyHeader = "X-CMC_PRO_API_KEY";
         private const string ExchangeApiKeyHeader = "apikey";
         private const string AcceptHeader = "Accepts";
         private const string AcceptHeaderValue = "application/json";
 
-        public CryptoRepository(HttpClient httpClient, IConfiguration configuration)
+        public CryptoRepository(HttpClient httpClient, IOptions<ThirdPartySettings> apiSettings)
         {
             _httpClient = httpClient;
-            _configuration = configuration;
+            _apiSettings = apiSettings.Value;
         }
 
         public async Task<decimal> GetCryptoPriceAsync(string cryptoCode, string symbol)
@@ -29,7 +30,7 @@ namespace Infrastructure
             var requestUrl = ConstructCoinMarketCapUrl(cryptoCode, symbol);
             var response = await SendRequestAsync(requestUrl, new Dictionary<string, string>
             {
-                { CoinMarketCapApiKeyHeader, _configuration["CoinMarketCap:ApiKey"] },
+                { CoinMarketCapApiKeyHeader, _apiSettings.CoinMarketCap.ApiKey },
                 { AcceptHeader, AcceptHeaderValue }
             });
 
@@ -39,19 +40,18 @@ namespace Infrastructure
 
         public async Task<Dictionary<string, decimal>> GetExchangeRatesAsync()
         {
-            var apiKey = _configuration["ExchangeRates:ApiKey"];
-            var currencies = _configuration["ExchangeRates:Currencies"];
-            var requestUrl = $"{_configuration["ExchangeRates:Url"]}access_key={apiKey}&symbols={currencies}&base=USD";
+            var requestUrl = $"{_apiSettings.ExchangeRates.Url}access_key={_apiSettings.ExchangeRates.ApiKey}&symbols={_apiSettings.ExchangeRates.Currencies}&base=USD";
 
             // Ensure the complete URL is formed correctly
-            if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(currencies))
+            if (string.IsNullOrEmpty(_apiSettings.ExchangeRates.ApiKey) ||
+                string.IsNullOrEmpty(_apiSettings.ExchangeRates.Currencies))
             {
                 throw new ArgumentException("API Key or currencies are not configured correctly.");
             }
 
             var response = await SendRequestAsync(requestUrl, new Dictionary<string, string>
             {
-                { ExchangeApiKeyHeader, apiKey }
+                { ExchangeApiKeyHeader, _apiSettings.ExchangeRates.ApiKey }
             });
 
             // Deserialize the response
@@ -69,7 +69,7 @@ namespace Infrastructure
 
         private string ConstructCoinMarketCapUrl(string cryptoCode, string symbol)
         {
-            var url = _configuration["CoinMarketCap:Url"];
+            var url = _apiSettings.CoinMarketCap.Url;
             var queryString = HttpUtility.ParseQueryString(string.Empty);
             queryString["symbol"] = cryptoCode;
             queryString["convert"] = symbol;
