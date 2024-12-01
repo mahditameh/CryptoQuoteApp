@@ -1,4 +1,4 @@
-﻿namespace Domins.ValueObjects
+﻿namespace Domain.ValueObjects
 {
     public class Price
     {

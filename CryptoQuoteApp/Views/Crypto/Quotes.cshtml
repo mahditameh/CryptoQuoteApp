@@ -1,9 +1,15 @@
-﻿@using Applications.DTO
+﻿@using Application.DTO
 @using CryptoQuoteApp.Helpers
 @model CryptoQuoteDto
 
-@{
-    ViewData["Title"] = "Crypto Quotes for " + Model.Symbol;
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
 }
 
 <h1>Quotes for <strong>@Model.Symbol</strong></h1>
@@ -22,7 +28,7 @@
             {
                 <tr>
                     <td>@rate.Key</td>
-                    <td>@CurrencyHelper.FormatCurrency(rate.Key, rate.Value)</td> <!-- Format currency here -->
+                    <td>@CurrencyHelper.FormatCurrency(rate.Key, rate.Value)</td>
                 </tr>
             }
         }

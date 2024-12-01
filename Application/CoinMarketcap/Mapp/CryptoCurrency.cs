@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Applications.CoinMarketcap.Mapp
+namespace Application.CoinMarketcap.Mapp
 {
     public class CryptoCurrency
     {

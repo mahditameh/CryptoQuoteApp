@@ -1,6 +1,6 @@
-﻿using Applications.DTO;
+﻿using Application.DTO;
 
-namespace Applications.Contracts
+namespace Application.Contracts
 {
     public interface ICryptoService
     {

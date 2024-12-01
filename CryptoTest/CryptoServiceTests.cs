@@ -1,5 +1,5 @@
-using Applications.Services;
-using Domins;
+using Domain;
+using Infrastructure.Services;
 using Moq;
 
 namespace CryptoTest

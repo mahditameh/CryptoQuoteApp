@@ -1,5 +1,6 @@
-﻿using Applications.Contracts;
+﻿using Application.Queries;
 using CryptoQuoteApp.Helpers.Filters;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoQuoteApp.Controllers
@@ -7,14 +8,13 @@ namespace CryptoQuoteApp.Controllers
     [SecurityHeadersAttribute]
     public class CryptoController : Controller
     {
-        private readonly ICryptoService _cryptoService;
+        private readonly IMediator _mediator;
 
-        public CryptoController(ICryptoService cryptoService)
+        public CryptoController(IMediator mediator)
         {
-            _cryptoService = cryptoService;
+            _mediator = mediator;
         }
 
-        // GET: /Crypto
         public IActionResult Index()
         {
             return View();
@@ -23,15 +23,16 @@ namespace CryptoQuoteApp.Controllers
         [HttpPost]
         public async Task<IActionResult> GetQuotes(string code)
         {
-            if (string.IsNullOrEmpty(code))
+            var result = await _mediator.Send(new GetCryptoQuoteQuery { CryptoCode = code });
+
+            if (!result.IsSuccess)
             {
-                return RedirectToAction("Index");
+                ModelState.AddModelError(string.Empty, result.Error);
+                return View("Index"); // Return to index with error
             }
-            var quotes = await _cryptoService.GetCryptoQuoteAsync(code);
 
-
-
-            return View("Quotes", quotes); // Return the Quotes view with results
+            return View("Quotes", result.Data);
         }
     }
+
 }

@@ -1,5 +1,5 @@
-﻿using Applications.CoinMarketcap.Mapp;
-using Domins;
+﻿using Application.CoinMarketcap.Mapp;
+using Domain;
 using Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 using System.Text.Json;

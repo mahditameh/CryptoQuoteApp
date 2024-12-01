@@ -1,4 +1,4 @@
-﻿namespace Applications.DTO
+﻿namespace Application.DTO
 {
     public class CryptoQuoteResponseDto
     {

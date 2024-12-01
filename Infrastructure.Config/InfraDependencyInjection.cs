@@ -1,4 +1,4 @@
-﻿using Domins;
+﻿using Domain;
 using Infrastructure;
 using Infrastructure.Configurations;
 using Infrastructure.Validators;

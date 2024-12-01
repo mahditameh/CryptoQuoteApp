@@ -1,4 +1,4 @@
-﻿namespace Domins
+﻿namespace Domain
 {
     public interface ICryptoValidator
     {

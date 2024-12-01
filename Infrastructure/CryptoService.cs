@@ -1,13 +1,13 @@
-﻿using Applications.Contracts;
-using Applications.DTO;
-using Domins;
+﻿using Application.Contracts;
+using Application.DTO;
+using Domain;
 using System.Runtime.CompilerServices;
 
 
 
 [assembly: InternalsVisibleTo("CryptoTest")]
 [assembly: InternalsVisibleTo("InfrastructureConfig")]
-namespace Applications.Services
+namespace Infrastructure.Services
 {
     internal class CryptoService : ICryptoService
     {
