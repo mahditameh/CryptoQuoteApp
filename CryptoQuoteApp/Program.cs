@@ -2,7 +2,7 @@ using Applications;
 using Infrastructure;
 using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
 // Registering HttpClient
 builder.Services.AddHttpClient(); // Register HttpClient
@@ -13,9 +13,7 @@ var isDevelopment = environment == Environments.Development;
 var configurationBuilder = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
-    .AddJsonFile("serilog.json", optional: true, reloadOnChange: true)
-    .AddJsonFile($"serilog.{environment}.json", optional: true, reloadOnChange: true);
+    .AddEnvironmentVariables();//we can set the keys in Environment variable too for more securities
 
 var configuration = configurationBuilder.Build();
 var logger = new LoggerConfiguration()

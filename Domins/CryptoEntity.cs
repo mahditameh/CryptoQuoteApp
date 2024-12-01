@@ -1,6 +1,6 @@
 ﻿namespace Domins
 {
-    public class CryptoQuote
+    public class CryptoEntity
     {
         public string Symbol { get; set; }
         public decimal Price { get; set; }
