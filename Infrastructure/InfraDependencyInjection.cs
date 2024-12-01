@@ -1,5 +1,6 @@
 ﻿using Domins;
 using Infrastructure.Configurations;
+using Infrastructure.Validators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +12,7 @@ namespace Infrastructure
         {
             services.AddTransient<ICryptoRepository, CryptoRepository>();
             services.Configure<ThirdPartySettings>(configuration.GetSection("ThirdPartySettings"));
-
+            services.AddTransient<ICryptoValidator, CryptoValidator>();
         }
     }
 }

@@ -7,18 +7,26 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("CryptoTest")]
 namespace Applications.Services
 {
-
     internal class CryptoService : ICryptoService
     {
         private readonly ICryptoRepository _cryptoRepository;
+        private readonly ICryptoValidator _cryptoValidator; // Add Validator
         private readonly string _baseCurrency = "USD";
-        public CryptoService(ICryptoRepository cryptoRepository)
+
+        public CryptoService(ICryptoRepository cryptoRepository, ICryptoValidator cryptoValidator)
         {
             _cryptoRepository = cryptoRepository;
+            _cryptoValidator = cryptoValidator; // Initialize Validator
         }
 
         public async Task<CryptoQuoteDto> GetCryptoQuoteAsync(string cryptoCode)
         {
+            // Validate cryptoCode before proceeding
+            if (!await _cryptoValidator.IsValidCryptoSymbolAsync(cryptoCode))
+            {
+                throw new ArgumentException($"The cryptocurrency code '{cryptoCode}' is invalid.");
+            }
+
             var cryptoPrice = await _cryptoRepository.GetCryptoPriceAsync(cryptoCode, _baseCurrency);
 
             return new CryptoQuoteDto()
@@ -29,18 +37,18 @@ namespace Applications.Services
             };
         }
 
-
         private async Task<Dictionary<string, decimal>> GettingEquivalentRateOtherCurrencies(decimal priceInUSD, string symbol)
         {
             var currenciesRates = await _cryptoRepository.GetExchangeRatesAsync();
             var equivalentAmounts = new Dictionary<string, decimal>();
+
             foreach (var currency in currenciesRates.Keys)
             {
-                // Calculate equivalent amount in selected currency
                 equivalentAmounts[currency] = priceInUSD * currenciesRates[currency];
             }
 
             return equivalentAmounts;
         }
     }
+
 }

@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-namespace Infrastructure.CoinMarketcap
+namespace Infrastructure.CoinMarketcap.GetCryptoDetails
 {
     public class BTC
     {
