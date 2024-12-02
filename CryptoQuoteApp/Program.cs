@@ -30,7 +30,7 @@ builder.Services.RegisterServices(configuration);
 
 // Register CryptoValidator with DI
 builder.Services.AddScoped<ICryptoValidator, CryptoValidator>();
-
+builder.Services.AddMemoryCache();
 // Preload CryptoCache
 var serviceProvider = builder.Services.BuildServiceProvider();
 var cryptoValidator = serviceProvider.GetRequiredService<ICryptoValidator>();

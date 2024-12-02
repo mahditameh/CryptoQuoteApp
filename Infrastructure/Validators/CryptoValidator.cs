@@ -1,7 +1,9 @@
 ﻿using Domain;
 using Infrastructure.Configurations;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Infrastructure.Validators
 {
@@ -27,7 +29,7 @@ namespace Infrastructure.Validators
             return cryptoMap.Any(c => c.Symbol.Equals(symbol, StringComparison.OrdinalIgnoreCase));
         }
 
-        private async Task<List<CryptoSymbol>> GetCryptoMapAsync()
+        public async Task<List<CryptoSymbol>> GetCryptoMapAsync()
         {
             if (_cache.TryGetValue(CacheKey, out List<CryptoSymbol> cachedMap))
             {
@@ -37,30 +39,32 @@ namespace Infrastructure.Validators
             var request = new HttpRequestMessage(HttpMethod.Get, "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map");
             request.Headers.Add("X-CMC_PRO_API_KEY", _apiSettings.CoinMarketCap.ApiKey);
 
-            var response = await _httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                throw new HttpRequestException("Failed to fetch cryptocurrency data.");
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var cryptoData = JsonSerializer.Deserialize<CryptoMapResponse>(jsonResponse);
+
+                var map = cryptoData.Data.ToList();
+                _cache.Set(CacheKey, map, TimeSpan.FromMinutes(CacheDurationInMinutes));
+
+                return map;
             }
-
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var cryptoData = JsonSerializer.Deserialize<CryptoMapResponse>(jsonResponse);
-
-            var map = cryptoData.Data.ToList();
-            _cache.Set(CacheKey, map, TimeSpan.FromMinutes(CacheDurationInMinutes));
-
-            return map;
+            catch
+            {
+                return new List<CryptoSymbol>(); // Return an empty list on failure
+            }
         }
+
     }
 
     public class CryptoMapResponse
     {
+        [JsonPropertyName("data")]
         public List<CryptoSymbol> Data { get; set; }
     }
 
-    public class CryptoSymbol
-    {
-        public string Symbol { get; set; }
-        public string Name { get; set; }
-    }
+
 }
