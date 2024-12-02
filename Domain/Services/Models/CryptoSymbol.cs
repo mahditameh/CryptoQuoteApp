@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Domain
+namespace Domain.Services.Models
 {
     public class CryptoSymbol
     {

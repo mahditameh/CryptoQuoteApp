@@ -1,6 +1,6 @@
 ﻿using Application.Handlers;
 using Application.Queries;
-using Domain;
+using Domain.RepositoriesContract;
 using Domain.Services;
 using Domain.ValueObjects;
 using Moq;

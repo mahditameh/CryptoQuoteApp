@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Domain.Services;
+using Domain.Services.Models;
 using Infrastructure.Configurations;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;

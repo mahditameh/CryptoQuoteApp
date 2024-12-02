@@ -1,5 +1,5 @@
 using CryptoQuoteApp.Helpers.Middleware;
-using Domain;
+using Domain.Services;
 using Infrastructure.Validators;
 using InfrastructureConfig;
 using Serilog;

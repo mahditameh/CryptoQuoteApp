@@ -1,5 +1,5 @@
 ﻿using Application.CoinMarketcap;
-using Domain;
+using Domain.RepositoriesContract;
 using Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;

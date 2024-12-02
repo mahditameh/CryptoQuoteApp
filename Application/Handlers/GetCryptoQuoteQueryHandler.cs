@@ -1,7 +1,7 @@
 ﻿using Application.Common;
 using Application.DTO;
 using Application.Queries;
-using Domain;
+using Domain.RepositoriesContract;
 using Domain.Services;
 using Domain.ValueObjects;
 using MediatR;

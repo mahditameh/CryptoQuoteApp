@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Domain.RepositoriesContract;
+using Domain.Services;
 using Infrastructure;
 using Infrastructure.Configurations;
 using Infrastructure.Validators;

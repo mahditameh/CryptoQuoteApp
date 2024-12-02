@@ -1,4 +1,6 @@
-﻿namespace Domain
+﻿using Domain.Services.Models;
+
+namespace Domain.Services
 {
     public interface ICryptoValidator
     {

@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Services.Models;
 using Infrastructure.Configurations;
 using Infrastructure.Validators;
 using Microsoft.Extensions.Caching.Memory;

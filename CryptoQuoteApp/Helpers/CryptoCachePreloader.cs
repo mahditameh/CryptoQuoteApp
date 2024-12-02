@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Domain.Services;
+
 namespace CryptoQuoteApp.Helpers
 {
     public class CryptoCachePreloader : BackgroundService
