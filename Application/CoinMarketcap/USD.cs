@@ -5,7 +5,7 @@ namespace Application.CoinMarketcap
     public class USD
     {
         [JsonPropertyName("price")]
-        public float Price { get; set; }
+        public decimal Price { get; set; }
 
         [JsonPropertyName("volume_24h")]
         public float Volume24h { get; set; }

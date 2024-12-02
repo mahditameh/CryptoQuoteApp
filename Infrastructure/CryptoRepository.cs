@@ -30,14 +30,21 @@ namespace Infrastructure
         {
             var requestUrl = ConstructCoinMarketCapUrl(cryptoCode, symbol);
             var response = await SendRequestAsync(requestUrl, new Dictionary<string, string>
-            {
-                { CoinMarketCapApiKeyHeader, _apiSettings.CoinMarketCap.ApiKey },
-                { AcceptHeader, AcceptHeaderValue }
-            });
+                   {
+                       { CoinMarketCapApiKeyHeader, _apiSettings.CoinMarketCap.ApiKey },
+                       { AcceptHeader, AcceptHeaderValue }
+                   });
 
             var quotes = JsonSerializer.Deserialize<QuoteJsonModel>(response);
-            return (decimal)quotes.Data.BTC.Quote.USD.Price;
+
+            if (quotes == null || !quotes.Data.ContainsKey(cryptoCode))
+            {
+                throw new Exception($"Data for cryptocurrency '{cryptoCode}' was not found.");
+            }
+
+            return quotes.Data[cryptoCode].Quote.USD.Price;
         }
+
 
         public async Task<Dictionary<string, decimal>> GetExchangeRatesAsync()
         {
