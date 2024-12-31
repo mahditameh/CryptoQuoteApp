@@ -3,7 +3,7 @@ namespace EndToEndPeckFlow.StepDefinitions
     [Binding]
     public sealed class CalculatorStepDefinitions
     {
-        private readonly Ca _calculator = new ;
+
         // For additional details on SpecFlow step definitions see https://go.specflow.org/doc-stepdef
 
         [Given("the first number is (.*)")]
