@@ -20,7 +20,7 @@ namespace CryptoQuoteApp.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> GetQuotes(string code)
         {
             var result = await _mediator.Send(new GetCryptoQuoteQuery { CryptoCode = code });
